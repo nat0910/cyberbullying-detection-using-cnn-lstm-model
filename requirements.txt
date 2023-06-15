@@ -1,0 +1,13 @@
+pandas
+numpy
+matplotlib
+nltk
+fastapi
+uvicorn
+tensorflow
+torch
+torchvision
+torchaudio
+imblearn
+sklearn
+gensim
