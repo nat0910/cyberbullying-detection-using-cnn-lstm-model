@@ -17,15 +17,16 @@ from starlette.background import BackgroundTask
 
 import pandas as pd
 
-from modules.cnn.detect_cyberbullying_dataframe import detect_cyberbullying_cnn_dataframe
-from modules.lstm.lstm_cyberbullying_detection_dataframe import detect_cyberbullying_ltsm_dataframe
+from app.modules.cnn.detect_cyberbullying_dataframe import detect_cyberbullying_cnn_dataframe
+from app.modules.lstm.lstm_cyberbullying_detection_dataframe import detect_cyberbullying_ltsm_dataframe
 
-from modules.preprocessing.text_preprocessing import preprocessing_input_text_cnn,preprocessing_input_text_ltsm
-from modules.preprocessing.datafram_preprocessing import df_prepocessing_cnn,df_prepocessing_lstm
+from app.modules.preprocessing.text_preprocessing import preprocessing_input_text_cnn,preprocessing_input_text_ltsm
+from app.modules.preprocessing.datafram_preprocessing import df_prepocessing_cnn,df_prepocessing_lstm
 
-from modules.cnn.detecting_cyberbullying_text import detect_cyberbullying_cnn_text
+from app.modules.cnn.detecting_cyberbullying_text import detect_cyberbullying_cnn_text
 
-from modules.lstm.lstm_cyberbullying_detection import detect_cyberbullying_ltsm_text
+from app.modules.lstm.lstm_cyberbullying_detection import detect_cyberbullying_ltsm_text
+
 
 
 import time

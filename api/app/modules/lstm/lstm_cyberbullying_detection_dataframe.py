@@ -16,7 +16,7 @@ torch.cuda.manual_seed_all(seed_value)
 import os  
 
 
-model_file = os.path.join(os.path.join(os.getcwd(),'model'),'cyber_2_state_dict.pt')
+model_file = os.path.join(os.path.join(os.getcwd(),'app\model'),'cyber_2_state_dict.pt')
 
 tokenize_data_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),"lstm_tokenize.json")
 
