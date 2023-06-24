@@ -17,17 +17,14 @@ from starlette.background import BackgroundTask
 
 import pandas as pd
 
-from app.modules.cnn.detect_cyberbullying_dataframe import detect_cyberbullying_cnn_dataframe
-from app.modules.lstm.lstm_cyberbullying_detection_dataframe import detect_cyberbullying_ltsm_dataframe
-
 from app.modules.preprocessing.text_preprocessing import preprocessing_input_text_cnn,preprocessing_input_text_ltsm
 from app.modules.preprocessing.datafram_preprocessing import df_prepocessing_cnn,df_prepocessing_lstm
 
-from app.modules.cnn.detecting_cyberbullying_text import detect_cyberbullying_cnn_text
-
+from app.modules.cnn.cnn_cyberbullying_detection import detect_cyberbullying_cnn_text
 from app.modules.lstm.lstm_cyberbullying_detection import detect_cyberbullying_ltsm_text
 
-
+from app.modules.cnn.cnn_cyberbullying_detection_dataframe import detect_cyberbullying_cnn_dataframe
+from app.modules.lstm.lstm_cyberbullying_detection_dataframe import detect_cyberbullying_ltsm_dataframe
 
 import time
 
@@ -92,29 +89,29 @@ async def upload_file(file:UploadFile):
     data = BytesIO(contents)
 
     if file.content_type == 'text/csv':    
-        df = pd.read_csv(data)
+        __df = pd.read_csv(data)
         file.file.close()
 
     if file.content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':    
-        df = pd.read_excel(data)
+        __df = pd.read_excel(data)
         file.file.close()
 
 
-    __df_pre_cnn = df_prepocessing_cnn(df. iloc[:,0])
+    __df_pre_cnn = df_prepocessing_cnn(__df. iloc[:,0])
     __clean_data = __df_pre_cnn.clean_data()
     __dcdf = detect_cyberbullying_cnn_dataframe(__clean_data)
     __predicted_output_df = __dcdf.predict()
 
-    df['cyberbullying_type_predicted'] = __predicted_output_df
+    __df['cyberbullying_type_predicted'] = __predicted_output_df
     
-    new_filename = "{}_{}_cnn.xlsx".format(os.path.splitext(file.filename)[0],timestr)
-    SAVE_FILE_PATH = os.path.join(UPLOAD_DIR,new_filename)
-    df.to_csv(SAVE_FILE_PATH,index=False)
+    __new_filename = "{}_{}_cnn.xlsx".format(os.path.splitext(file.filename)[0],timestr)
+    __SAVE_FILE_PATH = os.path.join(UPLOAD_DIR,__new_filename)
+    __df.to_csv(__SAVE_FILE_PATH,index=False)
 
     def cleanupFunction():
-        os.remove(SAVE_FILE_PATH)
+        os.remove(__SAVE_FILE_PATH)
 
-    return FileResponse(filename=new_filename.split('.')[0],path=SAVE_FILE_PATH,media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',background=BackgroundTask(cleanupFunction))
+    return FileResponse(filename=__new_filename.split('.')[0],path=__SAVE_FILE_PATH,media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',background=BackgroundTask(cleanupFunction))
 
 
 @app.post('/ltsm-predict-text',tags=['lstm-endpoints'])
@@ -141,15 +138,15 @@ async def upload_file(file:UploadFile,start:int,end:int):
         if not (file.content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'):
             raise HTTPException(400, detail="Invalid document type")
         
-    contents = file.file.read()
-    data = BytesIO(contents)
+    __contents = file.file.read()
+    __data = BytesIO(__contents)
 
     if file.content_type == 'text/csv':    
-        df = pd.read_csv(data)
+        df = pd.read_csv(__data)
         file.file.close()
 
     if file.content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':    
-        df = pd.read_excel(data)
+        df = pd.read_excel(__data)
         file.file.close()
 
     __df = df.iloc[start:end,0]
@@ -158,18 +155,18 @@ async def upload_file(file:UploadFile,start:int,end:int):
     __dlstmdf = detect_cyberbullying_ltsm_dataframe()
     __dlstmdf.fit(__clean_data)
     __predicted_output_df = __dlstmdf.predict()
-    output = pd.DataFrame({"text":__df,"predicted":__predicted_output_df})
+    __output = pd.DataFrame({"text":__df,"predicted":__predicted_output_df})
 
 
-    new_filename = "{}_{}_lstm.xlsx".format(os.path.splitext(file.filename)[0],timestr)
-    SAVE_FILE_PATH = os.path.join(UPLOAD_DIR,new_filename)
-    output.to_csv(SAVE_FILE_PATH,index=False)
+    __new_filename = "{}_{}_lstm.xlsx".format(os.path.splitext(file.filename)[0],timestr)
+    __SAVE_FILE_PATH = os.path.join(UPLOAD_DIR,__new_filename)
+    __output.to_csv(__SAVE_FILE_PATH,index=False)
 
 
     def cleanupFunction():
-        os.remove(SAVE_FILE_PATH)
+        os.remove(__SAVE_FILE_PATH)
 
-    return FileResponse(filename=new_filename.split('.')[0],path=SAVE_FILE_PATH,media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',background=BackgroundTask(cleanupFunction))
+    return FileResponse(filename=__new_filename.split('.')[0],path=__SAVE_FILE_PATH,media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',background=BackgroundTask(cleanupFunction))
 
 
 
