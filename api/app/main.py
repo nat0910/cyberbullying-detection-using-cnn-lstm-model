@@ -68,8 +68,7 @@ UPLOAD_DIR = os.path.join(BASE_DIR,"uploads")
 
 @app.get('/',tags=['default'])
 async def starting_endpoint():
-    return 'Please visit http://127.0.0.1:8000/docs to learn more about the API.',os.path.dirname(os.path.abspath(__file__))
-
+    return 'Please visit http://127.0.0.1:8000/docs to learn more about the API.'
 @app.post('/cnn-predict-text',tags=['cnn-endpoints'])
 async def predict_cyberbullying_using_cnn_model(q:str):
     __dtc = detect_cyberbullying_cnn_text()

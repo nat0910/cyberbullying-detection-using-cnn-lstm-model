@@ -8,6 +8,4 @@ tensorflow
 torch
 torchvision
 torchaudio
-imblearn
-sklearn
-gensim
+python-multipart

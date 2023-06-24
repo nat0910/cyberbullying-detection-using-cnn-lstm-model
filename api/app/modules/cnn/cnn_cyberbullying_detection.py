@@ -14,7 +14,7 @@ from tensorflow.keras.preprocessing.text import tokenizer_from_json
 
 import os  
 
-saved_model_file_path = os.path.join(os.path.join(os.getcwd(),'app\model'),'cyber_bullying_model_3_13-4-23(90.7029%).h5')
+saved_model_file_path = os.path.join(os.path.join(os.path.join(os.getcwd(),'app'),'model'),'cyber_bullying_model_3_13-4-23(90.7029%).h5')
 loaded_saved_model = load_model(saved_model_file_path)
 
 tokenize_data_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),"tokenize_data.json")
