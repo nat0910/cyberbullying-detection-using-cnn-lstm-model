@@ -37,6 +37,11 @@ tags_metadata =[
     "description": "Default endpoint of the API"
 },
 {
+    "name": "demo-file",
+    "description": "Download this demo file to understand the type structure of .csv, .xlsx  required for the dataframe endpoints."
+},
+
+{
     "name":"cnn-endpoints",
     "description": "These endpoints is used to detect cyberbullying in single text as well as for a file using the CNN model."
 },
@@ -48,7 +53,7 @@ tags_metadata =[
 
 app = FastAPI(
     title="Cyberbullying detection",
-    description="This API is for detection of cyberbullying in single text as well as for a file ('csv','excel') containing multiple texts.This API has 2 models CNN having accuarcy of 90.70% And LTSM having accuracy of 94.00%.",
+    description="This API is for detection of cyberbullying in single text as well as for a file ('.csv','.xlsx') containing multiple texts.This API has 2 models CNN having accuarcy of 90.70% And LTSM having accuracy of 94.00%.",
     openapi_tags=tags_metadata,
 )
 
@@ -71,6 +76,12 @@ UPLOAD_DIR = os.path.join(BASE_DIR,"uploads")
 async def starting_endpoint(req:Request):
     return 'Please visit {}docs to learn more about the API.'.format(req.base_url)
 
+@app.get('/get-demo-file',tags=['demo-file'])
+async def get_demo_xlsx_file():
+    filename = 'cyberbullying_tweets_demo.xlsx'
+    SAVE_FILE_PATH = os.path.join(UPLOAD_DIR,filename)
+    return  FileResponse(filename=filename.split('.')[0],path=SAVE_FILE_PATH,media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
 
 @app.post('/cnn-predict-text',tags=['cnn-endpoints'])
 async def predict_cyberbullying_using_cnn_model(q:str):
@@ -83,8 +94,7 @@ async def predict_cyberbullying_using_cnn_model(q:str):
 
 @app.post("/cnn-predict-dataframe",tags=['cnn-endpoints'])
 async def upload_file(file:UploadFile):
-    if not (file.content_type == 'text/csv'):
-        if not (file.content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'):
+    if not any((file.content_type == 'text/csv',file.content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')):
             raise HTTPException(400, detail="Invalid document type")
         
     contents = file.file.read()
@@ -136,8 +146,7 @@ async def upload_file(file:UploadFile,start:int,end:int):
     if (start-end)>500:
         raise HTTPException(400,detail="Please dercease the end number")
 
-    if not (file.content_type == 'text/csv'):
-        if not (file.content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'):
+    if not any((file.content_type == 'text/csv',file.content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')):
             raise HTTPException(400, detail="Invalid document type")
         
     __contents = file.file.read()
