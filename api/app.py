@@ -13,17 +13,19 @@ from typing_extensions import Annotated
 
 from io import BytesIO,StringIO
 
+from starlette.background import BackgroundTask
+
 import pandas as pd
 
-from modules.detect_cyberbullying_dataframe import detect_cyberbullying_cnn_dataframe
-from modules.ltsm_cyberbullying_detection_dataframe import detect_cyberbullying_ltsm_dataframe
+from modules.cnn.detect_cyberbullying_dataframe import detect_cyberbullying_cnn_dataframe
+from modules.lstm.lstm_cyberbullying_detection_dataframe import detect_cyberbullying_ltsm_dataframe
 
 from modules.preprocessing.text_preprocessing import preprocessing_input_text_cnn,preprocessing_input_text_ltsm
 from modules.preprocessing.datafram_preprocessing import df_prepocessing_cnn,df_prepocessing_lstm
 
-from modules.detecting_cyberbullying_text import detect_cyberbullying_cnn_text
+from modules.cnn.detecting_cyberbullying_text import detect_cyberbullying_cnn_text
 
-from modules.ltsm_cyberbullying_detection import detect_cyberbullying_ltsm_text
+from modules.lstm.lstm_cyberbullying_detection import detect_cyberbullying_ltsm_text
 
 
 import time
@@ -42,9 +44,6 @@ tags_metadata =[
 {
     "name":"lstm-endpoints",
     "description": "These endpoints is used to detect cyberbullying in single text as well as for a file using the LSTM model."
-},{
-    "name":"get-file"
-    ,"description": "Use this endpoint to retrieve the predicted file "
 }
 ]
 
@@ -71,7 +70,7 @@ UPLOAD_DIR = os.path.join(BASE_DIR,"uploads")
 
 @app.get('/',tags=['default'])
 async def starting_endpoint():
-    return 'Please visit http://127.0.0.1:8000/docs to learn more about the API.'
+    return 'Please visit http://127.0.0.1:8000/docs to learn more about the API.',os.path.dirname(os.path.abspath(__file__))
 
 @app.post('/cnn-predict-text',tags=['cnn-endpoints'])
 async def predict_cyberbullying_using_cnn_model(q:str):
@@ -107,11 +106,14 @@ async def upload_file(file:UploadFile):
 
     df['cyberbullying_type_predicted'] = __predicted_output_df
     
-    new_filename = "{}_{}_cnn.csv".format(os.path.splitext(file.filename)[0],timestr)
+    new_filename = "{}_{}_cnn.xlsx".format(os.path.splitext(file.filename)[0],timestr)
     SAVE_FILE_PATH = os.path.join(UPLOAD_DIR,new_filename)
     df.to_csv(SAVE_FILE_PATH,index=False)
 
-    return {"media_type": file.content_type,"filename":new_filename}
+    def cleanupFunction():
+        os.remove(SAVE_FILE_PATH)
+
+    return FileResponse(filename=new_filename.split('.')[0],path=SAVE_FILE_PATH,media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',background=BackgroundTask(cleanupFunction))
 
 
 @app.post('/ltsm-predict-text',tags=['lstm-endpoints'])
@@ -157,16 +159,22 @@ async def upload_file(file:UploadFile,start:int,end:int):
     __predicted_output_df = __dlstmdf.predict()
     output = pd.DataFrame({"text":__df,"predicted":__predicted_output_df})
 
-    new_filename = "{}_{}_lstm.csv".format(os.path.splitext(file.filename)[0],timestr)
+
+    new_filename = "{}_{}_lstm.xlsx".format(os.path.splitext(file.filename)[0],timestr)
     SAVE_FILE_PATH = os.path.join(UPLOAD_DIR,new_filename)
     output.to_csv(SAVE_FILE_PATH,index=False)
 
-    return {"media_type": file.content_type,"filename":new_filename}
+
+    def cleanupFunction():
+        os.remove(SAVE_FILE_PATH)
+
+    return FileResponse(filename=new_filename.split('.')[0],path=SAVE_FILE_PATH,media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',background=BackgroundTask(cleanupFunction))
 
 
-@app.get("/predicted_file",tags=['get-file'])
-async def get_predicted_file(filename:str):
-    SAVE_FILE_PATH = os.path.join(UPLOAD_DIR,filename)
-    if os.path.exists(SAVE_FILE_PATH):
-        return FileResponse(path=SAVE_FILE_PATH,media_type='text/csv',filename=filename)
-    raise HTTPException(404,detail="File Not Found!!")
+
+# @app.get("/predicted_file",tags=['get-file'])
+# async def get_predicted_file(filename:str):
+#     SAVE_FILE_PATH = os.path.join(UPLOAD_DIR,filename)
+#     if os.path.exists(SAVE_FILE_PATH):
+#         return FileResponse(path=SAVE_FILE_PATH,media_type='text/csv',filename=filename)
+#     raise HTTPException(404,detail="File Not Found!!")

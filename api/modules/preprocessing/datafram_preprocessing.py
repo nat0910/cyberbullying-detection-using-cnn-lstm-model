@@ -1,11 +1,15 @@
 import re
 import string
 import nltk 
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('stopwords')
 import pandas as pd
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem import PorterStemmer
+
 
 
 stop_words = set(stopwords.words('english'))
