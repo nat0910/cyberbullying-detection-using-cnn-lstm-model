@@ -14,11 +14,12 @@ from typing_extensions import Annotated
 from io import BytesIO,StringIO
 
 from starlette.background import BackgroundTask
+from starlette.requests import Request
 
 import pandas as pd
 
 from app.modules.preprocessing.text_preprocessing import preprocessing_input_text_cnn,preprocessing_input_text_ltsm
-from app.modules.preprocessing.datafram_preprocessing import df_prepocessing_cnn,df_prepocessing_lstm
+from app.modules.preprocessing.dataframe_preprocessing import df_prepocessing_cnn,df_prepocessing_lstm
 
 from app.modules.cnn.cnn_cyberbullying_detection import detect_cyberbullying_cnn_text
 from app.modules.lstm.lstm_cyberbullying_detection import detect_cyberbullying_ltsm_text
@@ -67,8 +68,10 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_DIR = os.path.join(BASE_DIR,"uploads")
 
 @app.get('/',tags=['default'])
-async def starting_endpoint():
-    return 'Please visit https://cyberbullying-detection-using-cnn-and.onrender.com/docs to learn more about the API.'
+async def starting_endpoint(req:Request):
+    return 'Please visit {}docs to learn more about the API.'.format(req.base_url)
+
+
 @app.post('/cnn-predict-text',tags=['cnn-endpoints'])
 async def predict_cyberbullying_using_cnn_model(q:str):
     __dtc = detect_cyberbullying_cnn_text()
