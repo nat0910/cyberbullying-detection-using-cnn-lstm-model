@@ -1,6 +1,5 @@
 ## Install the following packages
 
-<hr>
 
 pip install pandas
 
