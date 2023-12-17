@@ -118,7 +118,7 @@ async def upload_file(file:UploadFile):
     
     __new_filename = "{}_{}_cnn.xlsx".format(os.path.splitext(file.filename)[0],timestr)
     __SAVE_FILE_PATH = os.path.join(UPLOAD_DIR,__new_filename)
-    __df.to_csv(__SAVE_FILE_PATH,index=False)
+    __df.to_excel(__SAVE_FILE_PATH,index=False)
 
     def cleanupFunction():
         os.remove(__SAVE_FILE_PATH)
@@ -171,7 +171,7 @@ async def upload_file(file:UploadFile,start:int,end:int):
 
     __new_filename = "{}_{}_lstm.xlsx".format(os.path.splitext(file.filename)[0],timestr)
     __SAVE_FILE_PATH = os.path.join(UPLOAD_DIR,__new_filename)
-    __output.to_csv(__SAVE_FILE_PATH,index=False)
+    __output.to_excel(__SAVE_FILE_PATH,index=False)
 
 
     def cleanupFunction():
