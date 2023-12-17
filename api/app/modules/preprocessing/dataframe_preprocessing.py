@@ -52,6 +52,7 @@ class df_prepocessing_cnn:
         return clean_text
 
     def decontract(self,text):
+        text = str(text)
         text = text.replace('\r',' ').replace('\n',' ').lower()
         text = re.sub(r"won\'t", " will not", text)
         text = re.sub(r"won\'t've", " will not have", text)

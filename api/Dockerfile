@@ -10,5 +10,6 @@ COPY ./requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 COPY ./app /app/app
+RUN python -c "import nltk ; nltk.download('punkt');nltk.download('wordnet');nltk.download('stopwords')" 
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
